@@ -3,6 +3,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const usersRouter = require('./src/routes/user.route');
+const accountRoutes = require('./src/routes/account.route');
 const app = express();
 const PORT = 5000;
 
@@ -14,6 +15,7 @@ app.get('/', (req, res) => {
 app.use(cors());
 app.use(express.json());
 app.use('/api/v1/users', usersRouter);
+app.use("/api/v1/accounts", accountRoutes);
 
 
 async function connectDB() {
