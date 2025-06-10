@@ -30,7 +30,7 @@ const updateUser = async (req, res) => {
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
-}
+};
 
 const getSingleUser = async (req, res) => {
     try {
@@ -40,7 +40,7 @@ const getSingleUser = async (req, res) => {
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
-}
+};
 
 const deleteUser = async (req, res) => {
     try {
@@ -52,7 +52,7 @@ const deleteUser = async (req, res) => {
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
-}
+};
 
 const loginUser = async (req, res) => {
   try {
