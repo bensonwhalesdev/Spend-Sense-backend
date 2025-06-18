@@ -1,5 +1,6 @@
 const User = require('../models/user.model');
 const bcrypt = require('bcryptjs');
+const jwt = require("jsonwebtoken");
 
 const getAllUsers = async (req, res) => {
     try {
@@ -11,15 +12,15 @@ const getAllUsers = async (req, res) => {
 };
 
 const createUser = async (req, res) => {
-     const { firstname, lastname, email, password, age } = req.body;
+    try {
+    const { firstname, lastname, email, password} = req.body;
 
-     if (!firstname || !lastname || !email || !password || !age) {
+     if (!firstname || !lastname || !email || !password) {
         return res.status(400).json({ message: 'All fields are required' });
      }
-    try {
         const salt = await bcrypt.genSalt(10);
        const hashedPassword = await bcrypt.hash(password, salt);
-        const response = await User.create({ firstname, lastname, email, password: hashedPassword, age});
+        const response = await User.create({ firstname, lastname, email, password: hashedPassword});
         res.status(201).json(response);
     } catch (error) {
         res.status(500).json({
@@ -71,10 +72,20 @@ const loginUser = async (req, res) => {
       return res.status(400).json({ message: "Invalid email or password." });
     }
 
-    if (user.password !== password) {
-      return res.status(400).json({ message: "Invalid email or password." });
-    }
-    res.status(200).json(user);
+    const isPasswordCorrect = await bcrypt.compare(password, user.password);
+        if (!isPasswordCorrect) {
+            return res.status(400).json({ message: "something went wrong" });
+        }
+        const id = user._id;
+        const token = jwt.sign({ id }, process.env.JWT_SECRET_KEY, { expiresIn: "2m" });
+    
+         res.status(200).json({message: "Login successful",token,
+        user: {
+        _id: user._id,
+        firstname: user.firstname,
+        email: user.email,
+      },
+    });
 
   } catch (error) {
     console.error("Login error:", error.message);

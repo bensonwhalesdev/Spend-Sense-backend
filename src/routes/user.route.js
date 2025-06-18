@@ -6,7 +6,8 @@ const { createUser,
         deleteUser, 
         loginUser } = require('../controller/user.controller');
 const validate = require('../middleware/validate.middleware');
-const userSchema = require('../schema/user.schema')
+const userSchema = require('../schema/user.schema');
+const verifyToken = require('../middleware/verify-token.middleware');
 
 
 const router = express.Router();
