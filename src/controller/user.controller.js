@@ -12,21 +12,53 @@ const getAllUsers = async (req, res) => {
 };
 
 const createUser = async (req, res) => {
-    try {
-    const { firstname, lastname, email, password} = req.body;
+  try {
+    const { firstname, lastname, email, password } = req.body;
 
-     if (!firstname || !lastname || !email || !password) {
-        return res.status(400).json({ message: 'All fields are required' });
-     }
-        const salt = await bcrypt.genSalt(10);
-       const hashedPassword = await bcrypt.hash(password, salt);
-        const response = await User.create({ firstname, lastname, email, password: hashedPassword});
-        res.status(201).json(response);
-    } catch (error) {
-        res.status(500).json({
-            message: error.message
-        })
+    if (!firstname || !lastname || !email || !password) {
+      return res.status(400).json({ message: 'All fields are required' });
     }
+
+    // Check if user exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(409).json({ message: 'User already exists' });
+    }
+
+    // Hash password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // Create user
+    const newUser = await User.create({
+      firstname,
+      lastname,
+      email,
+      password: hashedPassword
+    });
+
+    // Generate JWT
+    const token = jwt.sign(
+      { id: newUser._id },
+      process.env.JWT_SECRET_KEY,
+      { expiresIn: "30d" }
+    );
+
+    // Send token + user info
+    res.status(201).json({
+      message: "User created successfully",
+      user: {
+        _id: newUser._id,
+        firstname: newUser.firstname,
+        email: newUser.email
+      },
+      token
+    });
+
+  } catch (error) {
+    console.error("Signup error:", error.message);
+    res.status(500).json({ message: "Server error" });
+  }
 };
 
 const updateUser = async (req, res) => {
