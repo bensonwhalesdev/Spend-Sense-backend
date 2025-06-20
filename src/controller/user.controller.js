@@ -18,33 +18,15 @@ const createUser = async (req, res) => {
     if (!firstname || !lastname || !email || !password) {
       return res.status(400).json({ message: 'All fields are required' });
     }
-
-    // Check if user exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(409).json({ message: 'User already exists' });
     }
-
-    // Hash password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
+    const newUser = await User.create({ firstname, lastname, email, password: hashedPassword});
+    const token = jwt.sign( { id: newUser._id }, process.env.JWT_SECRET_KEY, { expiresIn: "30d" } );
 
-    // Create user
-    const newUser = await User.create({
-      firstname,
-      lastname,
-      email,
-      password: hashedPassword
-    });
-
-    // Generate JWT
-    const token = jwt.sign(
-      { id: newUser._id },
-      process.env.JWT_SECRET_KEY,
-      { expiresIn: "30d" }
-    );
-
-    // Send token + user info
     res.status(201).json({
       message: "User created successfully",
       user: {
@@ -57,7 +39,7 @@ const createUser = async (req, res) => {
 
   } catch (error) {
     console.error("Signup error:", error.message);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ error: error.message });
   }
 };
 
@@ -109,7 +91,7 @@ const loginUser = async (req, res) => {
             return res.status(400).json({ message: "something went wrong" });
         }
         const id = user._id;
-        const token = jwt.sign({ id }, process.env.JWT_SECRET_KEY, { expiresIn: "2m" });
+        const token = jwt.sign({ id }, process.env.JWT_SECRET_KEY, { expiresIn: "30d" });
     
          res.status(200).json({message: "Login successful",token,
         user: {
@@ -121,7 +103,7 @@ const loginUser = async (req, res) => {
 
   } catch (error) {
     console.error("Login error:", error.message);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ errot: error.message });
   }
 };
 
