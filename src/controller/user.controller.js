@@ -24,7 +24,7 @@ const createUser = async (req, res) => {
     }
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
-    const newUser = await User.create({ firstname, lastname, email, password: hashedPassword});
+    const newUser = await User.create({ firstname, lastname, email, password: hashedPassword, signupDate: new Date(), });
     const token = jwt.sign( { id: newUser._id }, process.env.JWT_SECRET_KEY, { expiresIn: "30d" } );
 
     res.status(201).json({
