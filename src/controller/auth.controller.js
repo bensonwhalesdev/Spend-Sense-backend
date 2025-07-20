@@ -29,12 +29,12 @@ const signUp = async (req, res) => {
     const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET_KEY, { expiresIn: "30d" });
 
     // ✅ Set token in HTTP-only cookie
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: true, // set to true in production with HTTPS
-      sameSite: "strict",
-      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-    });
+    // res.cookie("token", token, {
+    //   httpOnly: true,
+    //   secure: true, // set to true in production with HTTPS
+    //   sameSite: "strict",
+    //   maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+    // });
 
     res.status(201).json({
       message: "User created successfully",
@@ -69,12 +69,12 @@ const loginUser = async (req, res) => {
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET_KEY, { expiresIn: "30d" });
 
     // ✅ Set token in HTTP-only cookie
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: true, // set to true in production
-      sameSite: "strict",
-      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-    });
+    // res.cookie("token", token, {
+    //   httpOnly: true,
+    //   secure: true, // set to true in production
+    //   sameSite: "strict",
+    //   maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+    // });
 
     res.status(200).json({
       message: "Login successful",
